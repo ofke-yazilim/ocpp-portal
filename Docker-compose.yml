@@ -1,0 +1,79 @@
+version: '3'
+networks:
+  ocpp:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 173.17.0.0/16
+
+services:
+
+  db:
+    container_name: postgres_container
+    image: bitnami/postgresql:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: PlystoreStage321!
+      POSTGRES_DB: ply-v2
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./configs/postgres-config/backup/:/backup
+    networks:
+      ocpp:
+        ipv4_address: 173.17.0.2
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    ports:
+      - "8888:80"
+    #volumes:
+      #- ./configs/postgres-config/ply-2.sql:/ply-v2.sql
+      #- ./configs/postgres-config/ply-2.sql:/ply-v2.sql
+      #- ./configs/postgres-config/backup/:/var/lib/pgadmin/storage/omer_gmail.com/
+    environment:
+      PGADMIN_DEFAULT_EMAIL: omer@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: q1w2e3
+    networks:
+      ocpp:
+        ipv4_address: 173.17.0.8
+
+  redis:
+    image: 'bitnami/redis:latest'
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=7tyrZQuPLFDQyXbe
+    networks:
+      ocpp:
+        ipv4_address: 173.17.0.5
+
+  mongodb:
+    container_name: mongodb_container
+    image: mongo:7.0.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: playstore
+      MONGO_INITDB_ROOT_PASSWORD: ttplay
+    ports:
+      - "27017:27017"
+    networks:
+      ocpp:
+        ipv4_address: 173.17.0.4
+
+  web:
+    image: image:v5.10.2.1
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    volumes:
+      - ./configs/nginx/conf.d/:/etc/nginx/conf.d
+      - ./configs/nginx/nginx:/etc/nginx/nginx.conf
+      - ./configs/php-fpm/php.ini:/etc/php.ini
+      - ./ocpp/:/data/www
+      - ./ocpp/.env:/data/www/.env
+    networks:
+      ocpp:
+        ipv4_address: 173.17.0.7
