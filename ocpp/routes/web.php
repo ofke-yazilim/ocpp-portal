@@ -13,5 +13,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
+Route::get('homepage', [\App\Http\Controllers\IndexController::class, 'dashboard'])->name('index.dashboard');
+Route::get('manage', [\App\Http\Controllers\IndexController::class, 'manage'])->name('index.manage');
+
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
