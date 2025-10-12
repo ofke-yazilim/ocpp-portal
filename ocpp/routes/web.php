@@ -4,7 +4,11 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    if(\Auth::check()){
+        return Inertia::render('dashboard');
+    } else{
+        return Inertia::render('auth/login');
+    }
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -13,6 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
+Route::resource('users', \App\Http\Controllers\UserController::class);
 Route::get('homepage', [\App\Http\Controllers\IndexController::class, 'dashboard'])->name('index.dashboard');
 Route::get('manage', [\App\Http\Controllers\IndexController::class, 'manage'])->name('index.manage');
 

@@ -1,5 +1,7 @@
 import '../css/app.css';
 
+import route from 'ziggy-js';
+import { Ziggy } from './ziggy'; // otomatik gelir
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';

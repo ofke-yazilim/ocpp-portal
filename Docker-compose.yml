@@ -14,8 +14,8 @@ services:
     image: bitnamisecure/postgresql:latest
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: PlystoreStage321!
-      POSTGRES_DB: ply-v2
+      POSTGRES_PASSWORD: ocpp123
+      POSTGRES_DB: ocpp
     ports:
       - "5432:5432"
     volumes:
@@ -29,10 +29,6 @@ services:
     container_name: pgadmin4_container
     ports:
       - "8888:80"
-    #volumes:
-      #- ./configs/postgres-config/ply-2.sql:/ply-v2.sql
-      #- ./configs/postgres-config/ply-2.sql:/ply-v2.sql
-      #- ./configs/postgres-config/backup/:/var/lib/pgadmin/storage/omer_gmail.com/
     environment:
       PGADMIN_DEFAULT_EMAIL: omer@gmail.com
       PGADMIN_DEFAULT_PASSWORD: q1w2e3
@@ -54,8 +50,8 @@ services:
     container_name: mongodb_container
     image: mongo:7.0.0
     environment:
-      MONGO_INITDB_ROOT_USERNAME: playstore
-      MONGO_INITDB_ROOT_PASSWORD: ttplay
+      MONGO_INITDB_ROOT_USERNAME: ocpp
+      MONGO_INITDB_ROOT_PASSWORD: ocpp
     ports:
       - "27017:27017"
     networks:

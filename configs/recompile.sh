@@ -13,8 +13,11 @@ crond
 cd /data/www
 rm -R node_modules
 rm package-lock.json
+composer require tightenco/ziggy #route süreçleri için kuruluyor.
 npm install -g npm@latest
 npm install
+npm install ziggy-js #route süreçleri için kuruluyor.
+npm install --save-dev @types/ziggy-js #route süreçleri için kuruluyor.
 #npm install -D tailwindcss @tailwindcss/vite
 npm run build
 
@@ -26,4 +29,5 @@ echo '# MobileConnect' >> /etc/hosts
 /usr/bin/php /data/www/artisan config:clear
 /usr/bin/php /data/www/artisan view:clear
 /usr/bin/php /data/www/artisan route:clear
+/usr/bin/php /data/www/artisan ziggy:generate
 
