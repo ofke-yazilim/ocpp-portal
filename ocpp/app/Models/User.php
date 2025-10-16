@@ -52,4 +52,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function rfid_cards(){
+        return $this->hasMany(RfidCard::class);
+    }
 }

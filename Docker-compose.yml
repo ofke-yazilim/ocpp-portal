@@ -64,6 +64,8 @@ services:
       - 80:80
       - 443:443
       - 8080:8080
+      - 8000:8000
+      - 6001:6001
     volumes:
       - ./configs/nginx/conf.d/:/etc/nginx/conf.d
       - ./configs/nginx/nginx:/etc/nginx/nginx.conf

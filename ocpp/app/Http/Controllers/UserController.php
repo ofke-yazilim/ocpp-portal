@@ -10,7 +10,8 @@ class UserController extends Controller
     public function index()
     {
         $users = User::select('id', 'name', 'email')->get();
-
+//        $user  = User::where('id',6)->with('rfid_cards')->first();
+//        dd($user);
         return Inertia::render('users/index', [
             'users' => $users,
         ]);

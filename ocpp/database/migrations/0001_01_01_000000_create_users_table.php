@@ -35,6 +35,7 @@ return new class extends Migration
                 $table->string('id')->primary();
                 $table->foreignId('user_id')->index();
                 $table->integer('uid')->index();
+                $table->string('site_id')->nullable();
                 $table->integer('status')->index();
                 $table->timestamps();
             });
@@ -65,6 +66,7 @@ return new class extends Migration
                 $table->string('name');
                 $table->string('location');
                 $table->text('address');
+                $table->integer('status')->index()->default(1);
                 $table->timestamps();
             });
         }

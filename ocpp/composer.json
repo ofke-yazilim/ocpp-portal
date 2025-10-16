@@ -15,6 +15,10 @@
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.9",
+        "predis/predis": "^3.2",
+        "ratchet/pawl": "^0.3.5",
+        "react/http": "^0.7.4",
+        "react/socket": "^0.8.2",
         "tightenco/ziggy": "^2.6"
     },
     "require-dev": {

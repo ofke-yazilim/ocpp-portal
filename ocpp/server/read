@@ -1,0 +1,12 @@
+- Bizim makinamızda aşağıdaki command ile dinlemeye başla
+php ocpp-server.php
+Arka planda çalıştır.
+nohup php /data/www/server/ocpp-server.php > /data/www/server/ocpp.log 2>&1 &
+
+- Karşı makina ya da şarj cihazı aşağıdaki adres ile bağlanır
+ws://localhost:6001
+
+Örnek kullanım:
+npm install -g wscat
+wscat -c ws://localhost:6001
+[2,"123","BootNotification",{"chargePointVendor":"Test"}]

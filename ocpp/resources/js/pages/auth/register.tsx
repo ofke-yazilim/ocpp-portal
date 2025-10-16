@@ -12,13 +12,22 @@ import AuthLayout from '@/layouts/auth-layout';
 import AppLayout from '@/layouts/app-layout';
 import type {BreadcrumbItem} from "@/types";
 
+interface Site {
+    id: string;
+    name: string;
+}
+
+interface Props {
+    sites: Site[];
+}
+
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Users', href: '/users' },
     { title: 'Create', href: '#' },
 ];
 
-export default function Register() {
+export default function Register({ sites }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Register" />
@@ -89,7 +98,7 @@ export default function Register() {
                                         name="role"
                                         required
                                         tabIndex={4}
-                                        className="border border-gray-100 text-gray-800 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                        className="border border-gray-800 text-gray-400 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                                         defaultValue=""
                                     >
                                         <option value="" disabled>Select role</option>
@@ -102,16 +111,19 @@ export default function Register() {
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="site">Site</Label>
-                                    <Input
+                                    <select
                                         id="site"
-                                        type="text"
-                                        required
-                                        autoFocus
-                                        tabIndex={5}
-                                        autoComplete="site"
                                         name="site"
-                                        placeholder="site"
-                                    />
+                                        required
+                                        tabIndex={5}
+                                        className="border border-gray-800 text-gray-400 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                        defaultValue=""
+                                    >
+                                        <option value="" disabled>Select Site</option>
+                                        {sites.map((site) => (
+                                            <option value="{site.id}">{site.name}</option>
+                                        ))}
+                                    </select>
                                     <InputError
                                         message={errors.site}
                                         className="mt-2"
@@ -137,12 +149,30 @@ export default function Register() {
                                 </div>
 
                                 <div className="grid gap-2">
+                                    <Label htmlFor="apartment">RFID</Label>
+                                    <Input
+                                        id="rfid"
+                                        type="text"
+                                        required
+                                        autoFocus
+                                        tabIndex={7}
+                                        autoComplete="rfid"
+                                        name="rfid"
+                                        placeholder="rfid"
+                                    />
+                                    <InputError
+                                        message={errors.rfid}
+                                        className="mt-2"
+                                    />
+                                </div>
+
+                                <div className="grid gap-2">
                                     <Label htmlFor="password">Password</Label>
                                     <Input
                                         id="password"
                                         type="password"
                                         required
-                                        tabIndex={7}
+                                        tabIndex={8}
                                         autoComplete="new-password"
                                         name="password"
                                         placeholder="Password"
@@ -158,7 +188,7 @@ export default function Register() {
                                         id="password_confirmation"
                                         type="password"
                                         required
-                                        tabIndex={8}
+                                        tabIndex={9}
                                         autoComplete="new-password"
                                         name="password_confirmation"
                                         placeholder="Confirm password"

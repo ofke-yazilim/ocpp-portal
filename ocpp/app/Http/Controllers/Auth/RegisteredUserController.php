@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Site;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -20,7 +21,10 @@ class RegisteredUserController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('auth/register');
+        $sites   = Site::select('id','name')->where('status', 1)->get();
+        return Inertia::render('auth/register', [
+            'sites' => $sites,
+        ]);
     }
 
     /**
@@ -35,7 +39,7 @@ class RegisteredUserController extends Controller
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
-//dd($request);
+
         $user = User::create([
             'name' => $request->name,
             'surname' => $request->surname,
@@ -46,6 +50,13 @@ class RegisteredUserController extends Controller
             'site_id' => $request->site,
             'ip' => $request->ip(),
             'password' => Hash::make($request->password),
+        ]);
+
+        $user->rfid_cards()->create([
+            'id'      => (string) \Illuminate\Support\Str::uuid(),
+            'uid'     => $request->rfid,
+            'site_id' => $request->site,
+            'status'  => 1,
         ]);
 
         event(new Registered($user));

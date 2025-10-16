@@ -10,6 +10,8 @@
 # Crontab çalıştırılıyor
 crond
 
+nohup /usr/bin/php /data/www/server/ocpp-server.php > /data/www/server/ocpp.log 2>&1 &
+
 cd /data/www
 rm -R node_modules
 rm package-lock.json
@@ -30,4 +32,5 @@ echo '# MobileConnect' >> /etc/hosts
 /usr/bin/php /data/www/artisan view:clear
 /usr/bin/php /data/www/artisan route:clear
 /usr/bin/php /data/www/artisan ziggy:generate
+
 

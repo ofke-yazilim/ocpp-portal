@@ -103,5 +103,8 @@ COPY ./configs/recompile.sh /recompile.sh
 RUN chmod +x /recompile.sh
 
 EXPOSE 80
+EXPOSE 8080
+EXPOSE 8000
+EXPOSE 6001
 EXPOSE 443
 CMD sh /recompile.sh; /usr/sbin/nginx -c /etc/nginx/nginx.conf; /usr/sbin/php-fpm --nodaemonize
