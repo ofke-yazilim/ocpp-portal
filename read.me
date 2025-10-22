@@ -1,5 +1,33 @@
-- docker buildx build --provenance=false -t image:v5.10.2.1
+- docker buildx build --provenance=false -t image:v5.10.18.1 .
+- docker-compose down --volumes
 - docker-compose up -d --build
 - php artisan migrate
 - composer update
 - https://localhost/
+
+
+
+docker save -o image-v5.10.17.1.tar image:v5.10.17.1
+docker load -i image-v5.10.17.1.tar
+
+docker save -o mongo.tar mongo:7.0.0
+docker save -o redis.tar bitnami/redis:latest
+docker save -o postgresql.tar bitnami/postgresql:latest
+docker save -o pgadmin4.tar dpage/pgadmin4:latest
+
+docker load -i mongo.tar
+docker load -i redis.tar
+docker load -i postgresql.tar
+docker load -i pgadmin4.tar
+
+
+docker tag db9bc963e434 local-postgres:latest
+
+
+docker run -d \
+  --name postgres_container \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=ocpp123 \
+  -e POSTGRES_DB=ocpp \
+  -p 5432:5432 \
+  local-postgres:latest

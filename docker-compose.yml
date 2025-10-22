@@ -13,7 +13,7 @@ services:
     container_name: postgres_container
     image: bitnamisecure/postgresql:latest
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: ocpp
       POSTGRES_PASSWORD: ocpp123
       POSTGRES_DB: ocpp
     ports:
@@ -30,7 +30,7 @@ services:
     ports:
       - "8888:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: omer@gmail.com
+      PGADMIN_DEFAULT_EMAIL: ocpp@gmail.com
       PGADMIN_DEFAULT_PASSWORD: q1w2e3
     networks:
       ocpp:
@@ -48,7 +48,7 @@ services:
 
   mongodb:
     container_name: mongodb_container
-    image: mongo:7.0.0
+    image: mongo:4.4
     environment:
       MONGO_INITDB_ROOT_USERNAME: ocpp
       MONGO_INITDB_ROOT_PASSWORD: ocpp
@@ -59,19 +59,17 @@ services:
         ipv4_address: 173.17.0.4
 
   web:
-    image: image:v5.10.2.1
+    image: image:v5.10.18.1
     ports:
       - 80:80
       - 443:443
       - 8080:8080
-      - 8000:8000
-      - 6001:6001
+      - 8008:8008
     volumes:
+      - ./configs/recompile.sh:/recompile.sh
       - ./configs/nginx/conf.d/:/etc/nginx/conf.d
-      - ./configs/nginx/nginx:/etc/nginx/nginx.conf
-      - ./configs/php-fpm/php.ini:/etc/php.ini
+      - ./configs/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./ocpp/:/data/www
-      - ./ocpp/.env:/data/www/.env
     networks:
       ocpp:
         ipv4_address: 173.17.0.7

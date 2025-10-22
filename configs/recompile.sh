@@ -11,6 +11,9 @@
 crond
 
 nohup /usr/bin/php /data/www/server/ocpp-server.php > /data/www/server/ocpp.log 2>&1 &
+#ps aux | grep ocpp-server.php
+#kill 12345
+
 
 cd /data/www
 rm -R node_modules
@@ -27,6 +30,7 @@ npm run build
 echo '# MobileConnect' >> /etc/hosts
 
 # Run Laravel Command
+/usr/bin/php /data/www/artisan migrate
 /usr/bin/php /data/www/artisan cache:clear
 /usr/bin/php /data/www/artisan config:clear
 /usr/bin/php /data/www/artisan view:clear

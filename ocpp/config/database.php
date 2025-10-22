@@ -112,6 +112,18 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'mongodb' => [
+            'driver'   => 'mongodb',
+            'host'     => env('MONGODB_HOST', 'mongodb'),
+            'port'     => env('MONGODB_PORT', 27017),
+            'database' => env('MONGODB_DATABASE','ocpp'),
+            'username' => env('MONGODB_USERNAME','ocpp'),
+            'password' => env('MONGODB_PASSWORD','ocpp'),
+            'options'  => [
+                'database' => 'admin' // required with MongoDB Atlas
+            ]
+        ],
+
     ],
 
     /*

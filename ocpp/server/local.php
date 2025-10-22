@@ -11,7 +11,7 @@ use Ratchet\WebSocket\WsServerInterface;
 use Predis\Client;
 use OCPP\Server\Mongo as MongoServer;
 
-class OcppServer implements MessageComponentInterface,WsServerInterface {
+class OcppServer implements MessageComponentInterface {
     protected $redis;
     protected $mongo;
     public $station;
@@ -23,11 +23,6 @@ class OcppServer implements MessageComponentInterface,WsServerInterface {
             'password' => '7tyrZQuPLFDQyXbe'
         ]);// varsayılan localhost:6379
         $this->mongo = new MongoServer();
-    }
-
-    public function getSubProtocols() {
-        // Tüm yaygın OCPP protokollerine izin ver
-        return ['ocpp1.6', 'ocpp1.5', 'ocpp2.0', 'ocpp2.0.1'];
     }
 
     public function onOpen(ConnectionInterface $conn) {
@@ -71,8 +66,8 @@ class OcppServer implements MessageComponentInterface,WsServerInterface {
 // Ratchet 0.4.4 zaten PHP 8 uyumlu
 $server = IoServer::factory(
     new HttpServer(new WsServer(new OcppServer())),
-    8008
+    8080
 );
 
-echo "✅ OCPP Server ws://localhost:8008\n";
+echo "✅ OCPP Server ws://localhost:8080\n";
 $server->run();

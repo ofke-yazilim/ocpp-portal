@@ -22,6 +22,7 @@ return new class extends Migration
                 $table->string('site_id')->nullable();
                 $table->string('apartment_id')->nullable();
                 $table->string('ip')->nullable();
+                $table->integer('status')->index()->default(1);
                 $table->text('data')->nullable();
                 $table->timestamp('email_verified_at')->nullable();
                 $table->string('password');
@@ -32,9 +33,9 @@ return new class extends Migration
 
         if(!Schema::hasTable('rfid_cards')) {
             Schema::create('rfid_cards', function (Blueprint $table) {
-                $table->string('id')->primary();
+                $table->id();
                 $table->foreignId('user_id')->index();
-                $table->integer('uid')->index();
+                $table->string('uid')->index();
                 $table->string('site_id')->nullable();
                 $table->integer('status')->index();
                 $table->timestamps();
@@ -62,11 +63,27 @@ return new class extends Migration
 
         if(!Schema::hasTable('sites')) {
             Schema::create('sites', function (Blueprint $table) {
-                $table->string('id')->primary();
+                $table->id();
+                $table->string('manager_id')->default(1);
                 $table->string('name');
                 $table->string('location');
                 $table->text('address');
                 $table->integer('status')->index()->default(1);
+                $table->timestamps();
+            });
+        }
+
+        if(!Schema::hasTable('stations')) {
+            Schema::create('stations', function (Blueprint $table) {
+                $table->id();
+                $table->string('station_alias');
+                $table->string('name');
+                $table->string('location');
+                $table->string('site_id')->nullable();
+                $table->string('firmware_version')->nullable();
+                $table->text('address');
+                $table->integer('status')->index()->default(1);
+                $table->date('last_seen')->index();
                 $table->timestamps();
             });
         }

@@ -76,6 +76,8 @@ RUN dnf -y install cronie && dnf clean all
 RUN rm -rf /etc/localtime
 RUN ln -s /usr/share/zoneinfo/Europe/Istanbul /etc/localtime
 
+RUN dnf install -y procps-ng
+
 # -------------------------------------------------
 # Laravel veya proje dizini için nginx ayarları
 # -------------------------------------------------
@@ -104,7 +106,7 @@ RUN chmod +x /recompile.sh
 
 EXPOSE 80
 EXPOSE 8080
-EXPOSE 8000
+EXPOSE 8008
 EXPOSE 6001
 EXPOSE 443
 CMD sh /recompile.sh; /usr/sbin/nginx -c /etc/nginx/nginx.conf; /usr/sbin/php-fpm --nodaemonize

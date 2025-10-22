@@ -8,5 +8,8 @@ ws://localhost:6001
 
 Örnek kullanım:
 npm install -g wscat
-wscat -c ws://localhost:6001
+wscat -c ws://localhost:8008
 [2,"123","BootNotification",{"chargePointVendor":"Test"}]
+
+
+wscat -c ws://100.101.198.135:8008

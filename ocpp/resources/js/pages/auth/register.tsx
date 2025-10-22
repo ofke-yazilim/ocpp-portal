@@ -201,7 +201,7 @@ export default function Register({ sites }: Props) {
                                 <Button
                                     type="submit"
                                     className="mt-2 w-full"
-                                    tabIndex={9}
+                                    tabIndex={10}
                                     data-test="register-user-button"
                                 >
                                     {processing && (

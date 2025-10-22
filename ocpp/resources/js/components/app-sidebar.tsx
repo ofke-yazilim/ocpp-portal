@@ -27,11 +27,11 @@ const mainNavItems: NavItem[] = [
         icon: User,
     }, {
         title: 'Sites',
-        href: '',
+        href: '/sites',
         icon: Building2,
     }, {
         title: 'Station',
-        href: '',
+        href: '/stations',
         icon: SatelliteDish,
     }, {
         title: 'Sessions',
@@ -39,7 +39,7 @@ const mainNavItems: NavItem[] = [
         icon: Activity,
     }, {
         title: 'Logs',
-        href: '',
+        href: '/logs',
         icon: FileText,
     },
 ];
