@@ -13,3 +13,22 @@ wscat -c ws://localhost:8008
 
 
 wscat -c ws://100.101.198.135:8008
+
+
+php /data/www/server/local.php > /data/www/server/ocpp.log
+ws://100.101.198.135:8008/fcef65f8b9776fdd163b111f483b8f8e
+
+
+
+mongosh -u playstore -p ttplay --authenticationDatabase admin
+use admin
+db.createUser({
+  user: "ocpp",
+  pwd: "ocpp",
+  roles: [
+    { role: "userAdminAnyDatabase", db: "admin" },
+    { role: "dbAdminAnyDatabase", db: "admin" },
+    { role: "readWriteAnyDatabase", db: "admin" },
+    { role: "clusterAdmin", db: "admin" }
+  ]
+})

@@ -7,7 +7,6 @@ use Ratchet\ConnectionInterface;
 use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
-use Ratchet\WebSocket\WsServerInterface;
 use Predis\Client;
 use OCPP\Server\Mongo as MongoServer;
 
@@ -15,6 +14,7 @@ class OcppServer implements MessageComponentInterface {
     protected $redis;
     protected $mongo;
     public $station;
+    protected $from;
     public function __construct() {
         $this->redis = new Client([
             'scheme'   => 'tcp',
@@ -36,6 +36,7 @@ class OcppServer implements MessageComponentInterface {
     }
     public function onMessage(ConnectionInterface $from, $msg) {
         try{
+            $this->from = $from;
             $msg_decode = $msg;
             // Mesajı Redis kuyruğuna gönder
             $this->redis->publish('ocpp_messages', $msg);
@@ -48,10 +49,8 @@ class OcppServer implements MessageComponentInterface {
         }
 
         echo "📨 Mesaj: $msg\n";
-        $data = json_decode($msg, true);
-//        if (is_array($data) && $data[0] === 2 && $data[2] === "BootNotification") {
-//            $from->send(json_encode([3, $data[1], ["status"=>"Accepted","currentTime"=>gmdate("c"),"interval"=>300]]));
-//        }
+
+        //$this->parseMessage($msg_decode);
     }
     public function onClose(ConnectionInterface $conn) { echo "❌ Kapandı\n"; }
     public function onError(ConnectionInterface $conn, \Exception $e) { echo "⚠️ ".$e->getMessage()."\n"; }
@@ -61,6 +60,17 @@ class OcppServer implements MessageComponentInterface {
         return (json_last_error() === JSON_ERROR_NONE);
     }
 
+    private function parseMessage($message){
+        if(is_array($message) && $message[0] === 2 && $message[2] === "BootNotification") {
+            $this->bookNotification($message);
+        }
+    }
+
+    private function bookNotification($message) {
+        $this->mongo->collection = "book";
+        $this->mongo->insertOne(['station_id'=>$this->station,'ocpp_messages'=>$message,'created_at'=>date('Y-m-d H:i:s'),'updated_at'=>date('Y-m-d H:i:s')]);
+        $this->from->send(json_encode([3, $message[1], ["status"=>"Accepted","currentTime"=>gmdate("c"),"interval"=>300]]));
+    }
 }
 
 // Ratchet 0.4.4 zaten PHP 8 uyumlu

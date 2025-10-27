@@ -99,5 +99,6 @@ return new class extends Migration
         Schema::dropIfExists('sessions');
         Schema::dropIfExists('rfid_cards');
         Schema::dropIfExists('sites');
+        Schema::dropIfExists('stations');
     }
 };
