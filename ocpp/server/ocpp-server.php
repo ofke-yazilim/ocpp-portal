@@ -69,7 +69,19 @@ class OcppServer implements MessageComponentInterface,WsServerInterface {
 
         $this->parseMessage($msg_decode);
     }
-    public function onClose(ConnectionInterface $conn) { echo "❌ Kapandı\n"; }
+    public function onClose(ConnectionInterface $conn) {
+        $request  = $conn->httpRequest;
+        $path     = $request->getUri()->getPath(); // örnek: /istasyon12
+
+        // İstasyon numarasını ayıkla
+        $station              = ltrim($path, '/'); //Hangi istasyon olduğu alınıyor.
+        $affected = $this->postgres->update('public.stations', [
+            'updated_at' => date('Y-m-d H:i:s'),
+            'status' => 0 //Bağlantı denemesi gönderildi.
+        ], 'station_alias = :alias', ['alias' => $this->station]);
+        echo $station;
+        echo "❌ Kapandı\n";
+    }
     public function onError(ConnectionInterface $conn, \Exception $e) { echo "⚠️ ".$e->getMessage()."\n"; }
 
     private function isJson($string) {
@@ -84,6 +96,10 @@ class OcppServer implements MessageComponentInterface,WsServerInterface {
             $this->authorize($message);
         } elseif (is_array($message) && $message[0] === 2 && $message[2] === "StartTransaction"){
             $this->startTransaction($message);
+        } elseif (is_array($message) && $message[0] === 2 && $message[2] === "MeterValues"){
+            $this->meterValues($message);
+        } elseif (is_array($message) && $message[0] === 2 && $message[2] === "StopTransaction"){
+            $this->stopTransaction($message);
         }
     }
 
@@ -175,6 +191,78 @@ class OcppServer implements MessageComponentInterface,WsServerInterface {
               'energy_delivered' => 0,
             ]);
             $response     = json_encode(['transactionId'=>$newSessionId ,['idTagInfo'=>["status"=>"Accepted","expiryDate"=>gmdate("c", strtotime("+6 hour")),"currentTime"=>gmdate("c"),"interval"=>300]]]);
+        } catch (\Exception $exception){
+            $type   = 'error';
+            $place  = 'catch';
+            $error  = $exception->getMessage()." - ".$exception->getFile()." - ".$exception->getLine();
+            $response = json_encode([3, $message[1], ['idTagInfo'=>["status"=>"Rejected","currentTime"=>gmdate("c")]]]);
+        } finally {
+            $this->mongo->insertOne(['type'=>$type,'place'=>$place,'method'=>$method,'user_id'=>($this->user?$this->user['id']:0),'idtag'=>$this->idtag,'station_id'=>$this->station_object['id'],'station_alias'=>$this->station,'ocpp_messages'=>$message,'response'=>$response,'created_at'=>date('Y-m-d H:i:s'),'updated_at'=>date('Y-m-d H:i:s'),'error'=>$error]);
+            $this->from->send($response);
+        }
+    }
+
+    private function stopTransaction($message){
+        $this->mongo->collection = "stopTransaction";
+        $type   = 'success';
+        $method = 'stopTransaction';
+        $place  = '';
+        $error  = '';
+        try{
+            $transaction_id    = $message[3]['transactionId'];
+            $idtag             = $message[3]['idTag'];
+            $meterStop         = $message[3]['meterStop'];
+            $reason            = $message[3]['reason'];
+            $energy_delivered1 = $message[3]['transactionData'][0]['sampledValue'][0]['value'];
+            $energy_delivered2 = $message[3]['transactionData'][0]['sampledValue'][1]['value'];
+            $updated_at        = $message[3]['transactionData'][0]['timestamp'];
+
+            $rfid_card = $this->postgres->selectFirst('public.rfid_cards', 'uid = :uid', params: [
+                'uid' => $idtag,
+            ]);
+
+            $user = $this->postgres->selectFirst('public.users', 'id = :id', params: [
+                'id' => $rfid_card['user_id'],
+            ]);
+
+            $affected     = $this->postgres->update('public.charging_sessions', ['updated_at' => $updated_at,'status'=>'completed','end_time'=>$updated_at], 'id = :id', ['id' => $transaction_id]);
+            $response     = json_encode(['transactionId'=>$transaction_id ,['idTagInfo'=>["status"=>"Accepted","expiryDate"=>gmdate("c", strtotime("+6 hour")),"currentTime"=>gmdate("c"),"interval"=>300]]]);
+        } catch (\Exception $exception){
+            $type   = 'error';
+            $place  = 'catch';
+            $error  = $exception->getMessage()." - ".$exception->getFile()." - ".$exception->getLine();
+            $response = json_encode([3, $message[1], ['idTagInfo'=>["status"=>"Rejected","currentTime"=>gmdate("c")]]]);
+        } finally {
+            $this->mongo->insertOne(['type'=>$type,'place'=>$place,'method'=>$method,'user_id'=>($user?$user['id']:0),'idtag'=>$idtag,'station_id'=>$this->station_object['id'],'station_alias'=>$this->station,'ocpp_messages'=>$message,'response'=>$response,'created_at'=>date('Y-m-d H:i:s'),'updated_at'=>date('Y-m-d H:i:s'),'error'=>$error]);
+            $this->from->send($response);
+        }
+    }
+
+    private function meterValues($message){
+        $this->mongo->collection = "meterValues";
+        $type   = 'success';
+        $method = 'meterValues';
+        $place  = '';
+        $error  = '';
+
+        try{
+            $transaction_id   = $message[3]['transactionId'];
+            $energy_delivered = $message[3]['meterValue'][0]['sampledValue'][0]['value'];
+            $updated_at       = $message[3]['meterValue'][0]['timestamp'];
+
+            $charging_session = $this->postgres->selectFirst('public.charging_sessions', 'id = :id', params: [
+                'id' => $transaction_id,
+            ]);
+
+            if(!$charging_session || $charging_session['end_time']){
+                $type     = 'error';
+                $place    = 259;
+                $error    = 'Şarj tamamlanmış.';
+                $response = json_encode([3, $message[1], ['idTagInfo'=>["status"=>"Failed","transaction_id"=>$transaction_id,"currentTime"=>gmdate("c"),"interval"=>300]]]);
+            } else{
+                $affected = $this->postgres->update('public.charging_sessions', ['updated_at' => date('Y-m-d H:i:s')], 'id = :id', ['id' => $transaction_id],['energy_delivered' => $energy_delivered]);
+                $response = json_encode([3, $message[1], ['idTagInfo'=>["status"=>"Accepted","transaction_id"=>$transaction_id,'r'=>$affected,"currentTime"=>gmdate("c"),"interval"=>300]]]);
+            }
         } catch (\Exception $exception){
             $type   = 'error';
             $place  = 'catch';

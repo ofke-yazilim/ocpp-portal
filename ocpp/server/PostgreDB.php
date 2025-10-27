@@ -58,9 +58,33 @@ class PostgresDB
         return (int) $this->conn->lastInsertId();
     }
 
-    public function update(string $table, array $data, string $whereClause, array $whereParams): int
+    public function updatestandart(string $table, array $data, string $whereClause, array $whereParams): int
     {
         $setClause = implode(', ', array_map(fn($k) => "$k = :$k", array_keys($data)));
+        $sql = "UPDATE {$table} SET {$setClause} WHERE {$whereClause}";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([...$data, ...$whereParams]);
+
+        return $stmt->rowCount();
+    }
+
+    public function update(string $table, array $data, string $whereClause, array $whereParams, array $increments = []): int
+    {
+        $setParts = [];
+
+        // Normal alanlar
+        foreach ($data as $key => $value) {
+            $setParts[] = "$key = :$key";
+        }
+
+        // Artırılacak alanlar
+        foreach ($increments as $key => $amount) {
+            $setParts[] = "$key = $key + :inc_$key";
+            $data["inc_$key"] = $amount;
+        }
+
+        $setClause = implode(', ', $setParts);
         $sql = "UPDATE {$table} SET {$setClause} WHERE {$whereClause}";
 
         $stmt = $this->conn->prepare($sql);

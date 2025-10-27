@@ -82,7 +82,7 @@ return new class extends Migration
                 $table->string('site_id')->nullable();
                 $table->string('firmware_version')->nullable();
                 $table->text('address');
-                $table->integer('status')->index()->default(1);
+                $table->integer('status')->index()->default(0);
                 $table->date('last_seen')->index();
                 $table->timestamps();
             });
