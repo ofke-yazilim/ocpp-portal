@@ -91,7 +91,7 @@ class OcppServer implements MessageComponentInterface,WsServerInterface {
 
     private function parseMessage($message){
         if(is_array($message) && $message[0] === 2 && $message[2] === "BootNotification") {
-            $this->bookNotification($message);
+            $this->bootNotification($message);
         } elseif (is_array($message) && $message[0] === 2 && $message[2] === "Authorize"){
             $this->authorize($message);
         } elseif (is_array($message) && $message[0] === 2 && $message[2] === "StartTransaction"){
@@ -103,10 +103,10 @@ class OcppServer implements MessageComponentInterface,WsServerInterface {
         }
     }
 
-    private function bookNotification($message) {
-        $this->mongo->collection = "book";
+    private function bootNotification($message) {
+        $this->mongo->collection = "boot";
         $type   = 'success';
-        $method = 'book';
+        $method = 'boot';
         $place  = '';
         $error  = '';
         try{
@@ -150,7 +150,8 @@ class OcppServer implements MessageComponentInterface,WsServerInterface {
                 'id' => $rfid_card['user_id'],
             ]);
 
-            $response = json_encode([3, $message[1], ['idTagInfo'=>["status"=>"Accepted","expiryDate"=>gmdate("c", strtotime("+1 hour")),"currentTime"=>gmdate("c"),"interval"=>300]]]);
+            // expiryDate database içine kaydet
+            $response = json_encode([3, $message[1], ['idTagInfo'=>["status"=>"Accepted","expiryDate"=>gmdate("c", strtotime("+1 year"))]]]);
             $affected = $this->postgres->update('public.stations', [
                 'updated_at' => date('Y-m-d H:i:s'),
                 'status' => 2 // Bağlantı sağlandı
@@ -190,12 +191,12 @@ class OcppServer implements MessageComponentInterface,WsServerInterface {
               'created_at' => $message[3]['timestamp'],
               'energy_delivered' => 0,
             ]);
-            $response     = json_encode(['transactionId'=>$newSessionId ,['idTagInfo'=>["status"=>"Accepted","expiryDate"=>gmdate("c", strtotime("+6 hour")),"currentTime"=>gmdate("c"),"interval"=>300]]]);
+            $response     = json_encode(['transactionId'=>$newSessionId ,['idTagInfo'=>["status"=>"Accepted"]]]);
         } catch (\Exception $exception){
             $type   = 'error';
             $place  = 'catch';
             $error  = $exception->getMessage()." - ".$exception->getFile()." - ".$exception->getLine();
-            $response = json_encode([3, $message[1], ['idTagInfo'=>["status"=>"Rejected","currentTime"=>gmdate("c")]]]);
+            $response = json_encode([3, $message[1], ['idTagInfo'=>["status"=>"Rejected"]]]);
         } finally {
             $this->mongo->insertOne(['type'=>$type,'place'=>$place,'method'=>$method,'user_id'=>($this->user?$this->user['id']:0),'idtag'=>$this->idtag,'station_id'=>$this->station_object['id'],'station_alias'=>$this->station,'ocpp_messages'=>$message,'response'=>$response,'created_at'=>date('Y-m-d H:i:s'),'updated_at'=>date('Y-m-d H:i:s'),'error'=>$error]);
             $this->from->send($response);
@@ -226,11 +227,11 @@ class OcppServer implements MessageComponentInterface,WsServerInterface {
             ]);
 
             $affected     = $this->postgres->update('public.charging_sessions', ['updated_at' => $updated_at,'status'=>'completed','end_time'=>$updated_at], 'id = :id', ['id' => $transaction_id]);
-            $response     = json_encode(['transactionId'=>$transaction_id ,['idTagInfo'=>["status"=>"Accepted","expiryDate"=>gmdate("c", strtotime("+6 hour")),"currentTime"=>gmdate("c"),"interval"=>300]]]);
+            $response     = json_encode(['idTagInfo'=>["status"=>"Accepted"]]);
         } catch (\Exception $exception){
-            $type   = 'error';
-            $place  = 'catch';
-            $error  = $exception->getMessage()." - ".$exception->getFile()." - ".$exception->getLine();
+            $type     = 'error';
+            $place    = 'catch';
+            $error    = $exception->getMessage()." - ".$exception->getFile()." - ".$exception->getLine();
             $response = json_encode([3, $message[1], ['idTagInfo'=>["status"=>"Rejected","currentTime"=>gmdate("c")]]]);
         } finally {
             $this->mongo->insertOne(['type'=>$type,'place'=>$place,'method'=>$method,'user_id'=>($user?$user['id']:0),'idtag'=>$idtag,'station_id'=>$this->station_object['id'],'station_alias'=>$this->station,'ocpp_messages'=>$message,'response'=>$response,'created_at'=>date('Y-m-d H:i:s'),'updated_at'=>date('Y-m-d H:i:s'),'error'=>$error]);
@@ -261,7 +262,8 @@ class OcppServer implements MessageComponentInterface,WsServerInterface {
                 $response = json_encode([3, $message[1], ['idTagInfo'=>["status"=>"Failed","transaction_id"=>$transaction_id,"currentTime"=>gmdate("c"),"interval"=>300]]]);
             } else{
                 $affected = $this->postgres->update('public.charging_sessions', ['updated_at' => date('Y-m-d H:i:s')], 'id = :id', ['id' => $transaction_id],['energy_delivered' => $energy_delivered]);
-                $response = json_encode([3, $message[1], ['idTagInfo'=>["status"=>"Accepted","transaction_id"=>$transaction_id,'r'=>$affected,"currentTime"=>gmdate("c"),"interval"=>300]]]);
+                //$response = json_encode([3, $message[1], ['idTagInfo'=>["status"=>"Accepted","transaction_id"=>$transaction_id,'r'=>$affected,"currentTime"=>gmdate("c"),"interval"=>300]]]);
+                $response = json_encode([3, $message[1], []]);
             }
         } catch (\Exception $exception){
             $type   = 'error';
