@@ -83,7 +83,8 @@ return new class extends Migration
                 $table->string('firmware_version')->nullable();
                 $table->text('address');
                 $table->integer('status')->index()->default(0);
-                $table->date('last_seen')->index();
+                $table->enum('approval_status', ['pending', 'active', 'rejected'])->default('pending');
+                $table->dateTime('last_seen')->index();
                 $table->timestamps();
             });
         }

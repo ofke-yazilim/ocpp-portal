@@ -13,6 +13,14 @@ use Inertia\Response;
 
 class ProfileController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    public function appearance(){
+        return Inertia::render('settings/appearance',['srole'=>$this->role]);
+    }
     /**
      * Show the user's profile settings page.
      */
@@ -21,6 +29,7 @@ class ProfileController extends Controller
         return Inertia::render('settings/profile', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
+            'srole'=>$this->role,
         ]);
     }
 

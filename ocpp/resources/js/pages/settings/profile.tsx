@@ -14,6 +14,8 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/profile';
 
+import { RoleProvider } from '@/context/role-context';
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Profile settings',
@@ -24,14 +26,17 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Profile({
     mustVerifyEmail,
     status,
+    srole
 }: {
     mustVerifyEmail: boolean;
     status?: string;
+    srole: string;
 }) {
     const { auth } = usePage<SharedData>().props;
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <RoleProvider value={srole}>
+            <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Profile settings" />
 
             <SettingsLayout>
@@ -144,5 +149,6 @@ export default function Profile({
                 <DeleteUser />
             </SettingsLayout>
         </AppLayout>
+        </RoleProvider>
     );
 }

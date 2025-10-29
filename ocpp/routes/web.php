@@ -12,14 +12,15 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+//    Route::get('dashboard', function () {
+//        return Inertia::render('dashboard');
+//    })->name('dashboard');
 });
 
 Route::resource('users', \App\Http\Controllers\UserController::class);
 Route::resource('stations', \App\Http\Controllers\StationController::class);
 Route::resource('sites', \App\Http\Controllers\SiteController::class);
+Route::get('dashboard', [\App\Http\Controllers\IndexController::class, 'dashboard'])->name('dashboard');
 Route::get('homepage', [\App\Http\Controllers\IndexController::class, 'dashboard'])->name('index.dashboard');
 Route::get('manage', [\App\Http\Controllers\IndexController::class, 'manage'])->name('index.manage');
 Route::any('logs', [\App\Http\Controllers\LogController::class, 'index'])->name('index.log');

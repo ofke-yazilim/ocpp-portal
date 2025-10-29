@@ -13,6 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { edit } from '@/routes/password';
 
+import { RoleProvider } from '@/context/role-context';
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Password settings',
@@ -20,12 +22,17 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Password() {
+interface Props {
+    srole: string;
+}
+
+export default function Password({ srole }: Props) {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <RoleProvider value={srole}>
+            <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Password settings" />
 
             <SettingsLayout>
@@ -142,5 +149,6 @@ export default function Password() {
                 </div>
             </SettingsLayout>
         </AppLayout>
+        </RoleProvider>
     );
 }

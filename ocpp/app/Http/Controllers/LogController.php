@@ -24,6 +24,7 @@ class LogController extends Controller
         $logs = (new Mongo())->setCollectionName('logs')->get();
         return Inertia::render('logs/index', [
             'logs' => $logs,
+            'srole'=>$this->role
         ]);
     }
 }

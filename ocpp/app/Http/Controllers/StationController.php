@@ -11,9 +11,18 @@ use Inertia\Inertia;
 
 class StationController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+        if($this->role == 'driver'){
+            \redirect()->route('dashboard',401)->send();
+            exit;
+        }
+    }
+
     public function index()
     {
-        $stations = Station::select('id','name','location','site_id','firmware_version','address','station_alias','status','last_seen')->get();
+        $stations = Station::select('id','name','location','site_id','firmware_version','address','station_alias','status','approval_status','last_seen')->whereIn('site_id',$this->site_id)->get();
         return Inertia::render('stations/index', [
             'stations' => $stations,
         ]);
@@ -21,7 +30,7 @@ class StationController extends Controller
 
     public function create()
     {
-        $sites   = Site::select('id','name')->where('status', 1)->get();
+        $sites   = Site::select('id','name')->whereIn('site_id',$this->site_id)->get();
         return Inertia::render('stations/create', ['sites' => $sites]);
     }
 
@@ -32,7 +41,7 @@ class StationController extends Controller
             'name' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'site_id' => 'required|string|exists:sites,id',
-            'firmware_version' => 'nullable|string|max:255',
+            //'firmware_version' => 'nullable|string|max:255',
             'address' => 'required|string',
             'status' => 'required|in:0,1',
         ]);
@@ -60,7 +69,7 @@ class StationController extends Controller
             'name' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'site_id' => 'required|string|exists:sites,id',
-            'firmware_version' => 'nullable|string|max:255',
+            //'firmware_version' => 'nullable|string|max:255',
             'address' => 'required|string',
             'status' => 'required|in:0,1'
         ]);

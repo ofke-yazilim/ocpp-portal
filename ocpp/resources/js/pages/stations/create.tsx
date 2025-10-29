@@ -33,6 +33,7 @@ export default function StationsCreate({ sites }: Props) {
         address: '',
         status: 1,
         last_seen: '',
+        approval_status: '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -111,25 +112,25 @@ export default function StationsCreate({ sites }: Props) {
                         />
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="firmware_version">Firmware Versiyonu</Label>
-                        <Input
-                            id="firmware_version"
-                            type="text"
-                            required
-                            autoFocus
-                            tabIndex={4}
-                            autoComplete="firmware_version"
-                            name="firmware_version"
-                            placeholder="Firmware Version"
-                            value={data.firmware_version}
-                            onChange={(e) => setData('firmware_version', e.target.value)}
-                        />
-                        <InputError
-                            message={errors.firmware_version}
-                            className="mt-2"
-                        />
-                    </div>
+                    {/*<div className="grid gap-2">*/}
+                    {/*    <Label htmlFor="firmware_version">Firmware Versiyonu</Label>*/}
+                    {/*    <Input*/}
+                    {/*        id="firmware_version"*/}
+                    {/*        type="text"*/}
+                    {/*        required*/}
+                    {/*        autoFocus*/}
+                    {/*        tabIndex={4}*/}
+                    {/*        autoComplete="firmware_version"*/}
+                    {/*        name="firmware_version"*/}
+                    {/*        placeholder="Firmware Version"*/}
+                    {/*        value={data.firmware_version}*/}
+                    {/*        onChange={(e) => setData('firmware_version', e.target.value)}*/}
+                    {/*    />*/}
+                    {/*    <InputError*/}
+                    {/*        message={errors.firmware_version}*/}
+                    {/*        className="mt-2"*/}
+                    {/*    />*/}
+                    {/*</div>*/}
 
                     <div className="grid gap-2">
                         <Label htmlFor="address">Adress</Label>
@@ -151,21 +152,21 @@ export default function StationsCreate({ sites }: Props) {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="role">Durum</Label>
+                        <Label htmlFor="role">Approval Status</Label>
                         <select
-                            id="status"
-                            name="status"
+                            id="approval_status"
+                            name="approval_status"
                             required
                             tabIndex={6}
                             className="border border-gray-800 text-gray-400 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                            value={data.status}
-                            onChange={(e) => setData('status', Number(e.target.value))}
+                            value={data.approval_status}
+                            onChange={(e) => setData('approval_status', e.target.value)}
                         >
-                            <option value="" disabled>Select role</option>
-                            <option value="0">Pasif</option>
-                            <option value="1">Aktif</option>
+                            <option value="pending">Pending</option>
+                            <option value="active">Aktif</option>
+                            <option value="rejected">Rejected</option>
                         </select>
-                        <InputError message={errors.status} className="mt-2"/>
+                        <InputError message={errors.approval_status} className="mt-2"/>
                     </div>
                     </div>
                     <Button

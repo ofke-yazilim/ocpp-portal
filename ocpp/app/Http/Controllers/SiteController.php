@@ -10,20 +10,32 @@ use Inertia\Inertia;
 
 class SiteController extends Controller
 {
+
+    public function __construct()
+    {
+        parent::__construct();
+        if($this->role == 'driver'){
+            \redirect()->route('dashboard',401)->send();
+            exit;
+        }
+    }
+
     public function index()
     {
         $users = User::select('id','name')->where('role','manager')->where('role','admin')->get();
-        $sites = Site::select('id','name','location','manager_id','address','status')->get();
+        $sites = Site::select('id','name','location','manager_id','address','status')->whereIn('id',$this->site_id)->get();
         return Inertia::render('sites/index', [
             'sites' => $sites,
             'users' => $users,
+            'srole'=>$this->role
         ]);
     }
 
     public function create()
     {
+        $users   = User::select('id','name')->where('status', 1)->get();
         $sites   = Site::select('id','name')->where('status', 1)->get();
-        return Inertia::render('sites/create', ['sites' => $sites]);
+        return Inertia::render('sites/create', ['sites' => $sites,'users'=>$users]);
     }
 
     public function store(Request $request)

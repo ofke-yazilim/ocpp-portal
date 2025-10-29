@@ -8,16 +8,14 @@ use Inertia\Inertia;
 
 class IndexController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function dashboard(Request $request)
     {
-        $data = [];
-        return view('desing1.dashboard', compact('data'));
-//        return Inertia::render('desing1/Dashboard', [
-//            'chargePoints' => 15,
-//            'totalEnergy' => 2345,
-//            'activeSessions' => 3,
-//            'lastActivity' => '2h ago',
-//        ]);
+        return Inertia::render('dashboard',['srole'=>$this->role]);
     }
 
     public function manage(Request $request)

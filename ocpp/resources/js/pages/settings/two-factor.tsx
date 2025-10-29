@@ -11,10 +11,12 @@ import { type BreadcrumbItem } from '@/types';
 import { Form, Head } from '@inertiajs/react';
 import { ShieldBan, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
+import { RoleProvider } from '@/context/role-context';
 
 interface TwoFactorProps {
     requiresConfirmation?: boolean;
     twoFactorEnabled?: boolean;
+    srole: string;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -27,6 +29,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function TwoFactor({
     requiresConfirmation = false,
     twoFactorEnabled = false,
+    srole
 }: TwoFactorProps) {
     const {
         qrCodeSvg,
@@ -41,7 +44,8 @@ export default function TwoFactor({
     const [showSetupModal, setShowSetupModal] = useState<boolean>(false);
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <RoleProvider value={srole}>
+            <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Two-Factor Authentication" />
             <SettingsLayout>
                 <div className="space-y-6">
@@ -133,5 +137,6 @@ export default function TwoFactor({
                 </div>
             </SettingsLayout>
         </AppLayout>
+        </RoleProvider>
     );
 }

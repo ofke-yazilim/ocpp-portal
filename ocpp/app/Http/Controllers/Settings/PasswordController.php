@@ -12,12 +12,17 @@ use Inertia\Response;
 
 class PasswordController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     /**
      * Show the user's password settings page.
      */
     public function edit(): Response
     {
-        return Inertia::render('settings/password');
+        return Inertia::render('settings/password',['srole'=>$this->role]);
     }
 
     /**

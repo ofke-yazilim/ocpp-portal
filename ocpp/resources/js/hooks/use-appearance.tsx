@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-export type Appearance = 'light' | 'dark' | 'system';
+export type Appearance = 'light' | 'dark' | 'theme-green' |'system';
 
 const prefersDark = () => {
     if (typeof window === 'undefined') {
@@ -25,6 +25,15 @@ const applyTheme = (appearance: Appearance) => {
 
     document.documentElement.classList.toggle('dark', isDark);
     document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+
+    // Tema sınıflarını temizle
+    document.documentElement.classList.remove('theme-green');
+
+    // Özel tema uygula
+    if (appearance === 'theme-green') {
+        document.documentElement.classList.add('theme-green');
+    }
+
 };
 
 const mediaQuery = () => {

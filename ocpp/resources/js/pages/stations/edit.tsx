@@ -28,6 +28,7 @@ interface Station {
     station_alias: string;
     status: number;
     last_seen: string;
+    approval_status: string;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -46,6 +47,7 @@ export default function StationsEdit({ sites,station }: Props) {
         address: station.address,
         status: station.status,
         last_seen: station.last_seen,
+        approval_status: station.approval_status,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -109,7 +111,7 @@ export default function StationsEdit({ sites,station }: Props) {
                             name="site_id"
                             required
                             tabIndex={3}
-                            className="border border-gray-800 text-gray-400 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            className="border text-gray-400 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                             value={data.site_id}
                             onChange={(e) => setData('site_id', e.target.value)}
                         >
@@ -124,25 +126,25 @@ export default function StationsEdit({ sites,station }: Props) {
                         />
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="firmware_version">Firmware Versiyonu</Label>
-                        <Input
-                            id="firmware_version"
-                            type="text"
-                            required
-                            autoFocus
-                            tabIndex={4}
-                            autoComplete="firmware_version"
-                            name="firmware_version"
-                            placeholder="Firmware Version"
-                            value={data.firmware_version}
-                            onChange={(e) => setData('firmware_version', e.target.value)}
-                        />
-                        <InputError
-                            message={errors.firmware_version}
-                            className="mt-2"
-                        />
-                    </div>
+                    {/*<div className="grid gap-2">*/}
+                    {/*    <Label htmlFor="firmware_version">Firmware Versiyonu</Label>*/}
+                    {/*    <Input*/}
+                    {/*        id="firmware_version"*/}
+                    {/*        type="text"*/}
+                    {/*        required*/}
+                    {/*        autoFocus*/}
+                    {/*        tabIndex={4}*/}
+                    {/*        autoComplete="firmware_version"*/}
+                    {/*        name="firmware_version"*/}
+                    {/*        placeholder="Firmware Version"*/}
+                    {/*        value={data.firmware_version}*/}
+                    {/*        onChange={(e) => setData('firmware_version', e.target.value)}*/}
+                    {/*    />*/}
+                    {/*    <InputError*/}
+                    {/*        message={errors.firmware_version}*/}
+                    {/*        className="mt-2"*/}
+                    {/*    />*/}
+                    {/*</div>*/}
 
                     <div className="grid gap-2">
                         <Label htmlFor="address">Adress</Label>
@@ -164,21 +166,21 @@ export default function StationsEdit({ sites,station }: Props) {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="role">Durum</Label>
+                        <Label htmlFor="role">Approval Status</Label>
                         <select
-                            id="status"
-                            name="status"
+                            id="approval_status"
+                            name="approval_status"
                             required
                             tabIndex={6}
-                            className="border border-gray-800 text-gray-400 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                            value={data.status}
+                            className="border text-gray-400 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            value={data.approval_status}
                             onChange={(e) => setData('status', Number(e.target.value))}
                         >
-                            <option value="" disabled>Select role</option>
-                            <option value="0">Pasif</option>
-                            <option value="1">Aktif</option>
+                            <option value="pending">Pending</option>
+                            <option value="active">Aktif</option>
+                            <option value="rejected">Rejected</option>
                         </select>
-                        <InputError message={errors.status} className="mt-2"/>
+                        <InputError message={errors.approval_status} className="mt-2"/>
                     </div>
                     </div>
 

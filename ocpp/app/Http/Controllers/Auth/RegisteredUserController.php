@@ -16,6 +16,15 @@ use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+        if($this->role == 'driver'){
+            \redirect()->route('dashboard',401)->send();
+            exit;
+        }
+    }
+
     /**
      * Show the registration page.
      */

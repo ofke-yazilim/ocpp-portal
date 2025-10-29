@@ -8,6 +8,8 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit as editAppearance } from '@/routes/appearance';
 
+import { RoleProvider } from '@/context/role-context';
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Appearance settings',
@@ -15,20 +17,26 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Appearance() {
-    return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Appearance settings" />
+interface Props {
+    srole: string;
+}
 
-            <SettingsLayout>
-                <div className="space-y-6">
-                    <HeadingSmall
-                        title="Appearance settings"
-                        description="Update your account's appearance settings"
-                    />
-                    <AppearanceTabs />
-                </div>
-            </SettingsLayout>
-        </AppLayout>
+export default function Appearance({ srole }: Props) {
+    return (
+        <RoleProvider value={srole}>
+            <AppLayout breadcrumbs={breadcrumbs}>
+                <Head title="Appearance settings" />
+
+                <SettingsLayout>
+                    <div className="space-y-6">
+                        <HeadingSmall
+                            title="Appearance settings"
+                            description="Update your account's appearance settings"
+                        />
+                        <AppearanceTabs />
+                    </div>
+                </SettingsLayout>
+            </AppLayout>
+        </RoleProvider>
     );
 }

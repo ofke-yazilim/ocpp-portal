@@ -4,6 +4,19 @@ import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Trash2, Pencil } from 'lucide-react';
 
+interface _Status {
+    id: number;
+    name: string;
+}
+
+const statuses: _Status[] = [
+    { id: 0, name: '✅ Available'},
+    { id: 1, name: '📡 Boot Notification' },
+    { id: 2, name: '🔐 Authorize'},
+    { id: 3, name: '💳 Start Transaction'},
+    { id: 4, name: '🔌 Connected'}
+];
+
 interface Station {
     id: number;
     name: string;
@@ -14,6 +27,7 @@ interface Station {
     station_alias: string;
     status: number;
     last_seen: string;
+    approval_status: string;
 }
 
 interface Props {
@@ -56,6 +70,7 @@ export default function StationsIndex({ stations }: Props) {
                             <th className="px-4 py-3 text-left text-sm font-medium">Alias</th>
                             <th className="px-4 py-3 text-left text-sm font-medium">Location</th>
                             <th className="px-4 py-3 text-left text-sm font-medium">Status</th>
+                            <th className="px-4 py-3 text-left text-sm font-medium">Approval Status</th>
                             <th className="px-4 py-3 text-left text-sm font-medium">Firmware Version</th>
                             <th className="px-4 py-3 text-right text-sm font-medium">Last Seen</th>
                         </tr>
@@ -68,7 +83,8 @@ export default function StationsIndex({ stations }: Props) {
                                 <td className="px-4 py-2 text-sm">{station.site_id}</td>
                                 <td className="px-4 py-2 text-sm">{station.station_alias}</td>
                                 <td className="px-4 py-2 text-sm">{station.location}</td>
-                                <td className="px-4 py-2 text-sm">{station.status}</td>
+                                <td className="px-4 py-2 text-sm">{statuses.find(s => s.id === station.status)?.name || 'Unknown'}</td>
+                                <td className="px-4 py-2 text-sm">{station.approval_status}</td>
                                 <td className="px-4 py-2 text-sm">{station.firmware_version}</td>
                                 <td className="px-4 py-2 text-sm">{station.last_seen}</td>
                                 <td className="px-4 py-2 text-right text-sm">

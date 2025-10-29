@@ -100,6 +100,8 @@ class OcppServer implements MessageComponentInterface,WsServerInterface {
             $this->meterValues($message);
         } elseif (is_array($message) && $message[0] === 2 && $message[2] === "StopTransaction"){
             $this->stopTransaction($message);
+        } elseif (is_array($message) && $message[0] === 2 && $message[2] === "Heartbeat"){
+            $this->heartBeat($message);
         }
     }
 
@@ -204,7 +206,7 @@ class OcppServer implements MessageComponentInterface,WsServerInterface {
     }
 
     private function stopTransaction($message){
-        $this->mongo->collection = "stopTransaction";
+        $this->mongo->collection = "stop_transaction";
         $type   = 'success';
         $method = 'stopTransaction';
         $place  = '';
@@ -261,10 +263,31 @@ class OcppServer implements MessageComponentInterface,WsServerInterface {
                 $error    = 'Şarj tamamlanmış.';
                 $response = json_encode([3, $message[1], ['idTagInfo'=>["status"=>"Failed","transaction_id"=>$transaction_id,"currentTime"=>gmdate("c"),"interval"=>300]]]);
             } else{
-                $affected = $this->postgres->update('public.charging_sessions', ['updated_at' => date('Y-m-d H:i:s')], 'id = :id', ['id' => $transaction_id],['energy_delivered' => $energy_delivered]);
+                $affected = $this->postgres->update('public.charging_sessions', ['updated_at' => date('Y-m-d H:i:s'),'energy_delivered' => $energy_delivered], 'id = :id', ['id' => $transaction_id]);
                 //$response = json_encode([3, $message[1], ['idTagInfo'=>["status"=>"Accepted","transaction_id"=>$transaction_id,'r'=>$affected,"currentTime"=>gmdate("c"),"interval"=>300]]]);
                 $response = json_encode([3, $message[1], []]);
             }
+        } catch (\Exception $exception){
+            $type   = 'error';
+            $place  = 'catch';
+            $error  = $exception->getMessage()." - ".$exception->getFile()." - ".$exception->getLine();
+            $response = json_encode([3, $message[1], ['idTagInfo'=>["status"=>"Rejected","currentTime"=>gmdate("c")]]]);
+        } finally {
+            $this->mongo->insertOne(['type'=>$type,'place'=>$place,'method'=>$method,'user_id'=>($this->user?$this->user['id']:0),'idtag'=>$this->idtag,'station_id'=>$this->station_object['id'],'station_alias'=>$this->station,'ocpp_messages'=>$message,'response'=>$response,'created_at'=>date('Y-m-d H:i:s'),'updated_at'=>date('Y-m-d H:i:s'),'error'=>$error]);
+            $this->from->send($response);
+        }
+    }
+
+    private function heartBeat($message){
+        $this->mongo->collection = "heartbeat";
+        $type   = 'success';
+        $method = 'heartBeat';
+        $place  = '';
+        $error  = '';
+
+        try{
+            $affected = $this->postgres->update('public.stations', ['last_seen' => date('Y-m-d H:i:s')], 'id = :id', ['id' => $this->station_object['id']]);
+            $response = json_encode([3, $message[1], []]);
         } catch (\Exception $exception){
             $type   = 'error';
             $place  = 'catch';
